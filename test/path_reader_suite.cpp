@@ -12,12 +12,14 @@
 
 #include <trial/url/path_reader.hpp>
 
+namespace url = trial::url;
+
 BOOST_AUTO_TEST_SUITE(path_reader_suite)
 
 BOOST_AUTO_TEST_CASE(test_empty)
 {
     const char input[] = "";
-    trial::url::path_reader reader(input);
+    url::path_reader reader(input);
     BOOST_REQUIRE_EQUAL(reader.literal_segment(), "");
     BOOST_REQUIRE_EQUAL(reader.next(), false);
 }
@@ -25,7 +27,7 @@ BOOST_AUTO_TEST_CASE(test_empty)
 BOOST_AUTO_TEST_CASE(test_slash)
 {
     const char input[] = "/";
-    trial::url::path_reader reader(input);
+    url::path_reader reader(input);
     BOOST_REQUIRE_EQUAL(reader.literal_segment(), "");
     BOOST_REQUIRE_EQUAL(reader.next(), false);
 }
@@ -33,7 +35,7 @@ BOOST_AUTO_TEST_CASE(test_slash)
 BOOST_AUTO_TEST_CASE(test_slash_slash)
 {
     const char input[] = "//";
-    trial::url::path_reader reader(input);
+    url::path_reader reader(input);
     BOOST_REQUIRE_EQUAL(reader.literal_segment(), "");
     BOOST_REQUIRE_EQUAL(reader.next(), true);
     BOOST_REQUIRE_EQUAL(reader.literal_segment(), "");
@@ -43,7 +45,7 @@ BOOST_AUTO_TEST_CASE(test_slash_slash)
 BOOST_AUTO_TEST_CASE(test_absolute_unreserved)
 {
     const char input[] = "/az09-._~";
-    trial::url::path_reader reader(input);
+    url::path_reader reader(input);
     BOOST_REQUIRE_EQUAL(reader.literal_segment(), "az09-._~");
     BOOST_REQUIRE_EQUAL(reader.segment(), "az09-._~");
     BOOST_REQUIRE_EQUAL(reader.next(), false);
@@ -52,7 +54,7 @@ BOOST_AUTO_TEST_CASE(test_absolute_unreserved)
 BOOST_AUTO_TEST_CASE(test_absolute_subdelims)
 {
     const char input[] = "/!$&'()*+,;=";
-    trial::url::path_reader reader(input);
+    url::path_reader reader(input);
     BOOST_REQUIRE_EQUAL(reader.literal_segment(), "!$&'()*+,;=");
     BOOST_REQUIRE_EQUAL(reader.segment(), "!$&'()*+,;=");
     BOOST_REQUIRE_EQUAL(reader.next(), false);
@@ -61,7 +63,7 @@ BOOST_AUTO_TEST_CASE(test_absolute_subdelims)
 BOOST_AUTO_TEST_CASE(test_absolute_two_unreserved)
 {
     const char input[] = "/alpha/bravo";
-    trial::url::path_reader reader(input);
+    url::path_reader reader(input);
     BOOST_REQUIRE_EQUAL(reader.segment(), "alpha");
     BOOST_REQUIRE_EQUAL(reader.next(), true);
     BOOST_REQUIRE_EQUAL(reader.segment(), "bravo");
@@ -71,7 +73,7 @@ BOOST_AUTO_TEST_CASE(test_absolute_two_unreserved)
 BOOST_AUTO_TEST_CASE(test_absolute_at)
 {
     const char input[] = "/@";
-    trial::url::path_reader reader(input);
+    url::path_reader reader(input);
     BOOST_REQUIRE_EQUAL(reader.segment(), "@");
     BOOST_REQUIRE_EQUAL(reader.next(), false);
 }
@@ -79,7 +81,7 @@ BOOST_AUTO_TEST_CASE(test_absolute_at)
 BOOST_AUTO_TEST_CASE(test_absolute_colon)
 {
     const char input[] = "/:";
-    trial::url::path_reader reader(input);
+    url::path_reader reader(input);
     BOOST_REQUIRE_EQUAL(reader.segment(), ":");
     BOOST_REQUIRE_EQUAL(reader.next(), false);
 }
@@ -87,7 +89,7 @@ BOOST_AUTO_TEST_CASE(test_absolute_colon)
 BOOST_AUTO_TEST_CASE(test_absolute_pct_encoded)
 {
     const char input[] = "/%20";
-    trial::url::path_reader reader(input);
+    url::path_reader reader(input);
     BOOST_REQUIRE_EQUAL(reader.literal_segment(), "%20");
     BOOST_REQUIRE_EQUAL(reader.segment(), " ");
     BOOST_REQUIRE_EQUAL(reader.next(), false);
@@ -96,7 +98,7 @@ BOOST_AUTO_TEST_CASE(test_absolute_pct_encoded)
 BOOST_AUTO_TEST_CASE(test_absolute_pct_encoded_more)
 {
     const char input[] = "/%20:%20";
-    trial::url::path_reader reader(input);
+    url::path_reader reader(input);
     BOOST_REQUIRE_EQUAL(reader.literal_segment(), "%20:%20");
     BOOST_REQUIRE_EQUAL(reader.segment(), " : ");
     BOOST_REQUIRE_EQUAL(reader.next(), false);
@@ -105,7 +107,7 @@ BOOST_AUTO_TEST_CASE(test_absolute_pct_encoded_more)
 BOOST_AUTO_TEST_CASE(test_absolute_mix)
 {
     const char input[] = "/a/0/./!/@/:/%20";
-    trial::url::path_reader reader(input);
+    url::path_reader reader(input);
     BOOST_REQUIRE_EQUAL(reader.segment(), "a");
     BOOST_REQUIRE_EQUAL(reader.next(), true);
     BOOST_REQUIRE_EQUAL(reader.segment(), "0");
