@@ -27,6 +27,7 @@ public:
 
     basic_authority_parser(const view_type&);
 
+    const view_type& authority() const;
     const view_type& userinfo() const;
     const view_type& host() const;
     const view_type& port() const;
@@ -36,6 +37,7 @@ private:
     std::size_t parse_host(const view_type&);
 
 private:
+    view_type current_authority;
     view_type current_userinfo;
     view_type current_host;
     view_type current_port;

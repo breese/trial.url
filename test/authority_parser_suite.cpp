@@ -20,6 +20,7 @@ BOOST_AUTO_TEST_CASE(test_empty)
 {
     const char input[] = "";
     url::authority_parser parser(input);
+    BOOST_REQUIRE_EQUAL(parser.authority(), "");
     BOOST_REQUIRE_EQUAL(parser.userinfo(), "");
     BOOST_REQUIRE_EQUAL(parser.host(), "");
     BOOST_REQUIRE_EQUAL(parser.port(), "");
@@ -29,6 +30,7 @@ BOOST_AUTO_TEST_CASE(test_host)
 {
     const char input[] = "1.2.3.4";
     url::authority_parser parser(input);
+    BOOST_REQUIRE_EQUAL(parser.authority(), "1.2.3.4");
     BOOST_REQUIRE_EQUAL(parser.userinfo(), "");
     BOOST_REQUIRE_EQUAL(parser.host(), "1.2.3.4");
     BOOST_REQUIRE_EQUAL(parser.port(), "");
@@ -38,6 +40,7 @@ BOOST_AUTO_TEST_CASE(test_host_port)
 {
     const char input[] = "1.2.3.4:80";
     url::authority_parser parser(input);
+    BOOST_REQUIRE_EQUAL(parser.authority(), "1.2.3.4:80");
     BOOST_REQUIRE_EQUAL(parser.userinfo(), "");
     BOOST_REQUIRE_EQUAL(parser.host(), "1.2.3.4");
     BOOST_REQUIRE_EQUAL(parser.port(), "80");
@@ -47,6 +50,7 @@ BOOST_AUTO_TEST_CASE(test_userinfo_host_port)
 {
     const char input[] = "user@1.2.3.4:80";
     url::authority_parser parser(input);
+    BOOST_REQUIRE_EQUAL(parser.authority(), "user@1.2.3.4:80");
     BOOST_REQUIRE_EQUAL(parser.userinfo(), "user");
     BOOST_REQUIRE_EQUAL(parser.host(), "1.2.3.4");
     BOOST_REQUIRE_EQUAL(parser.port(), "80");
@@ -56,6 +60,7 @@ BOOST_AUTO_TEST_CASE(test_host_regname)
 {
     const char input[] = "example.com";
     url::authority_parser parser(input);
+    BOOST_REQUIRE_EQUAL(parser.authority(), "example.com");
     BOOST_REQUIRE_EQUAL(parser.userinfo(), "");
     BOOST_REQUIRE_EQUAL(parser.host(), "example.com");
     BOOST_REQUIRE_EQUAL(parser.port(), "");

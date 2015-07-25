@@ -31,6 +31,13 @@ basic_authority_parser<CharT>::basic_authority_parser(const view_type& view)
 
 template <typename CharT>
 const typename basic_authority_parser<CharT>::view_type&
+basic_authority_parser<CharT>::authority() const
+{
+    return current_authority;
+}
+
+template <typename CharT>
+const typename basic_authority_parser<CharT>::view_type&
 basic_authority_parser<CharT>::userinfo() const
 {
     return current_userinfo;
@@ -79,9 +86,10 @@ std::size_t basic_authority_parser<CharT>::parse(const view_type& view)
         if (processed > 0)
         {
             current_port = view.substr(total, processed);
-            total += processed - 1;
+            total += processed;
         }
     }
+    current_authority = view.substr(0, total);
     return total;
 }
 
