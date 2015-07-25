@@ -4,6 +4,7 @@
 
 add_executable(test_url
   runner.cpp
+  authority_parser_suite.cpp
   path_reader_suite.cpp
 )
 
