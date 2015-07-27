@@ -70,7 +70,7 @@ std::size_t dec_octet<CharT>::match(const view_type& view)
             case syntax::character<value_type>::alpha_5:
                 return 3;
             default:
-                return 0;
+                return 2;
             }
 
         default:
