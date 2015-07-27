@@ -13,7 +13,7 @@
 
 #include <trial/url/syntax/character.hpp>
 #include <trial/url/syntax/scheme.hpp>
-#include <trial/url/authority_parser.hpp>
+#include <trial/url/authority_reader.hpp>
 #include <trial/url/path_reader.hpp>
 
 namespace trial
@@ -130,7 +130,7 @@ void basic_parser<CharT>::parse(view_type input)
 
         if (input.empty() || (input.front() != syntax::character<value_type>::alpha_colon))
             return; // FIXME: Report error
-        input.remove_prefix(sizeof(syntax::character<value_type>::alpha_colon));
+        input.remove_prefix(1);
     }
 
     processed = parse_hier_part(input);
@@ -191,6 +191,7 @@ std::size_t basic_parser<CharT>::parse_hier_part(const view_type& input)
             processed = parse_authority(input.substr(current));
             if (processed == 0)
                 return 0;
+            current_authority = input.substr(current, processed);
             current += processed;
         }
     }
@@ -205,9 +206,15 @@ std::size_t basic_parser<CharT>::parse_hier_part(const view_type& input)
 template <typename CharT>
 std::size_t basic_parser<CharT>::parse_authority(const view_type& input)
 {
-    basic_authority_parser<value_type> aparser(input);
-    current_authority = aparser.authority();
-    return current_authority.size();
+    basic_authority_reader<value_type> reader(input);
+
+    typename view_type::const_iterator end = input.begin();
+    do
+    {
+        end = reader.literal().end();
+    } while (reader.next());
+
+    return std::distance(input.begin(), end);
 }
 
 template <typename CharT>
@@ -218,7 +225,7 @@ std::size_t basic_parser<CharT>::parse_path(const view_type& input)
     typename view_type::const_iterator end = input.begin();
     do
     {
-        end = reader.literal_segment().end();
+        end = reader.literal().end();
     } while (reader.next());
 
     return std::distance(input.begin(), end);

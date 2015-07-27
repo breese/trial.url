@@ -21,29 +21,49 @@ namespace url
 
 template <typename CharT>
 basic_path_reader<CharT>::basic_path_reader(const view_type& view)
-    : input(view)
+    : input(view),
+      current_view(view)
 {
     first();
 }
 
 template <typename CharT>
-const typename basic_path_reader<CharT>::view_type&
-basic_path_reader<CharT>::literal_segment() const
+token::category::value basic_path_reader<CharT>::category() const
 {
-    return current_segment;
+    return token::category(code());
 }
 
 template <typename CharT>
-typename basic_path_reader<CharT>::string_type
-basic_path_reader<CharT>::segment() const
+token::code::value basic_path_reader<CharT>::code() const
 {
-    return syntax::segment<value_type>::decode(current_segment);
+    return token::code(subcode());
+}
+
+template <typename CharT>
+token::subcode::value basic_path_reader<CharT>::subcode() const
+{
+    return current_token;
+}
+
+template <typename CharT>
+const typename basic_path_reader<CharT>::view_type&
+basic_path_reader<CharT>::literal() const
+{
+    return current_view;
+}
+
+template <typename CharT>
+template <typename ReturnType>
+ReturnType basic_path_reader<CharT>::value() const
+{
+    return syntax::segment<value_type>::decode(current_view);
 }
 
 template <typename CharT>
 bool basic_path_reader<CharT>::next()
 {
-    return (this->*next_state)();
+    current_token = (this->*next_state)();
+    return category() != token::category::error;
 }
 
 template <typename CharT>
@@ -51,7 +71,8 @@ void basic_path_reader<CharT>::first()
 {
     if (input.empty())
     {
-        current_segment = input;
+        current_view = input;
+        current_token = token::subcode::end;
         next_state = &basic_path_reader<value_type>::next_done;
     }
     else if (input.front() == syntax::character<value_type>::alpha_slash)
@@ -66,14 +87,14 @@ void basic_path_reader<CharT>::first()
 }
 
 template <typename CharT>
-bool basic_path_reader<CharT>::next_done()
+token::subcode::value basic_path_reader<CharT>::next_done()
 {
-    current_segment = input;
-    return false;
+    current_view = input;
+    return token::subcode::end;
 }
 
 template <typename CharT>
-bool basic_path_reader<CharT>::next_abempty()
+token::subcode::value basic_path_reader<CharT>::next_abempty()
 {
     // RFC 3986, section 3.3
     //
@@ -84,14 +105,14 @@ bool basic_path_reader<CharT>::next_abempty()
     {
         input.remove_prefix(1);
         std::size_t processed = syntax::segment<value_type>::match(input);
-        current_segment = input.substr(0, processed);
+        current_view = input.substr(0, processed);
         input.remove_prefix(processed);
-        return true;
+        return token::subcode::path_segment;
     }
     else
     {
         next_state = &basic_path_reader<value_type>::next_done;
-        return false;
+        return next_done();
     }
 }
 
