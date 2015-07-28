@@ -44,6 +44,27 @@ basic_parser<CharT>::literal_authority() const
 
 template <typename CharT>
 const typename basic_parser<CharT>::view_type&
+basic_parser<CharT>::literal_userinfo() const
+{
+    return current_userinfo;
+}
+
+template <typename CharT>
+const typename basic_parser<CharT>::view_type&
+basic_parser<CharT>::literal_host() const
+{
+    return current_host;
+}
+
+template <typename CharT>
+const typename basic_parser<CharT>::view_type&
+basic_parser<CharT>::literal_port() const
+{
+    return current_port;
+}
+
+template <typename CharT>
+const typename basic_parser<CharT>::view_type&
 basic_parser<CharT>::literal_path() const
 {
     return current_path;
@@ -75,6 +96,27 @@ typename basic_parser<CharT>::string_type
 basic_parser<CharT>::authority() const
 {
     return string_type(current_authority.begin(), current_authority.end());
+}
+
+template <typename CharT>
+typename basic_parser<CharT>::string_type
+basic_parser<CharT>::userinfo() const
+{
+    return string_type(current_userinfo.begin(), current_userinfo.end());
+}
+
+template <typename CharT>
+typename basic_parser<CharT>::string_type
+basic_parser<CharT>::host() const
+{
+    return string_type(current_host.begin(), current_host.end());
+}
+
+template <typename CharT>
+typename basic_parser<CharT>::string_type
+basic_parser<CharT>::port() const
+{
+    return string_type(current_port.begin(), current_port.end());
 }
 
 template <typename CharT>
@@ -124,18 +166,21 @@ void basic_parser<CharT>::parse(const view_type& input)
             break;
 
         case token::code::authority_userinfo:
-            authority_begin = reader.literal().begin();
-            authority_end = reader.literal().end();
+            current_userinfo = reader.literal();
+            authority_begin = current_userinfo.begin();
+            authority_end = current_userinfo.end();
             break;
 
         case token::code::authority_host:
+            current_host = reader.literal();
             if (authority_begin == input.end())
-                authority_begin = reader.literal().begin();
-            authority_end = reader.literal().end();
+                authority_begin = current_host.begin();
+            authority_end = current_host.end();
             break;
 
         case token::code::authority_port:
-            authority_end = reader.literal().end();
+            current_port = reader.literal();
+            authority_end = current_port.end();
             break;
 
         case token::code::path_segment:

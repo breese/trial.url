@@ -31,12 +31,18 @@ public:
 
     const view_type& literal_scheme() const;
     const view_type& literal_authority() const;
+    const view_type& literal_userinfo() const;
+    const view_type& literal_host() const;
+    const view_type& literal_port() const;
     const view_type& literal_path() const;
     const view_type& literal_query() const;
     const view_type& literal_fragment() const;
 
     string_type scheme() const;
     string_type authority() const;
+    string_type userinfo() const;
+    string_type host() const;
+    string_type port() const;
     string_type path() const;
     string_type query() const;
     string_type fragment() const;
@@ -53,6 +59,9 @@ private:
 private:
     view_type current_scheme;
     view_type current_authority;
+    view_type current_userinfo;
+    view_type current_host;
+    view_type current_port;
     view_type current_path;
     view_type current_query;
     view_type current_fragment;
