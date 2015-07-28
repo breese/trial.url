@@ -13,6 +13,7 @@
 
 #include <string>
 #include <boost/utility/string_ref.hpp>
+#include <trial/url/token.hpp>
 
 // http://www.w3.org/TR/html401/interact/forms.html
 
@@ -33,6 +34,10 @@ public:
 
     bool next();
 
+    token::category::value category() const;
+    token::code::value code() const;
+    token::subcode::value subcode() const;
+
     const view_type& literal_key() const;
     const view_type& literal_value() const;
 
@@ -46,6 +51,7 @@ private:
 
 private:
     view_type input;
+    token::subcode::value current_token;
     view_type current_key;
     view_type current_value;
 };

@@ -95,17 +95,27 @@ bool basic_query_form_reader<CharT>::first()
 
     std::size_t processed = parse_key(input);
     if (processed == 0)
+    {
+        current_token = token::subcode::end;
         return false;
+    }
     current_key = input.substr(0, processed);
     input.remove_prefix(processed);
 
     if (input.front() != syntax::character<value_type>::alpha_equal)
+    {
+        current_token = token::subcode::unknown;
         return false;
+    }
     input.remove_prefix(1);
+    current_token = token::subcode::query_form_key;
 
     processed = parse_value(input);
     if (processed == 0)
+    {
+        current_token = token::subcode::unknown;
         return false;
+    }
     current_value = input.substr(0, processed);
     input.remove_prefix(processed);
 
@@ -151,6 +161,24 @@ template <typename ReturnType>
 ReturnType basic_query_form_reader<CharT>::value() const
 {
     return detail::query_form_converter<value_type, ReturnType>::convert(current_value);
+}
+
+template <typename CharT>
+token::category::value basic_query_form_reader<CharT>::category() const
+{
+    return token::category(code());
+}
+
+template <typename CharT>
+token::code::value basic_query_form_reader<CharT>::code() const
+{
+    return token::code(subcode());
+}
+
+template <typename CharT>
+token::subcode::value basic_query_form_reader<CharT>::subcode() const
+{
+    return current_token;
 }
 
 template <typename CharT>

@@ -70,6 +70,8 @@ struct subcode
         path_segment,
 
         query,
+        query_form_key,
+        query_form_value,
 
         fragment
     };
@@ -134,6 +136,8 @@ inline code::value code(subcode::value value)
         return code::path_segment;
 
     case subcode::query:
+    case subcode::query_form_key:
+    case subcode::query_form_value:
         return code::query;
 
     case subcode::fragment:
