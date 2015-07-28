@@ -27,59 +27,8 @@ namespace reader
 
 template <typename CharT>
 basic_authority<CharT>::basic_authority(const view_type& view)
-    : input(view),
-      current_token(token::subcode::end),
-      current_view(view)
+    : super(view)
 {
-    first();
-}
-
-template <typename CharT>
-token::category::value basic_authority<CharT>::category() const
-{
-    return token::category(code());
-}
-
-template <typename CharT>
-token::code::value basic_authority<CharT>::code() const
-{
-    return token::code(subcode());
-}
-
-template <typename CharT>
-token::subcode::value basic_authority<CharT>::subcode() const
-{
-    return current_token;
-}
-
-template <typename CharT>
-const typename basic_authority<CharT>::view_type&
-basic_authority<CharT>::literal() const
-{
-    return current_view;
-}
-
-template <typename CharT>
-template <typename ReturnType>
-ReturnType basic_authority<CharT>::value() const
-{
-    // FIXME: Via converter
-    return ReturnType(current_view.begin(),
-                      current_view.end());
-}
-
-template <typename CharT>
-const typename basic_authority<CharT>::view_type&
-basic_authority<CharT>::tail() const
-{
-    return input;
-}
-
-template <typename CharT>
-void basic_authority<CharT>::reset(const view_type& view)
-{
-    input = current_view = view;
-    current_token = token::subcode::end;
     first();
 }
 
@@ -90,7 +39,13 @@ void basic_authority<CharT>::first()
 }
 
 template <typename CharT>
-bool basic_authority<CharT>::next()
+void basic_authority<CharT>::do_reset()
+{
+    first();
+}
+
+template <typename CharT>
+bool basic_authority<CharT>::do_next()
 {
     // RFC 3986 Section 3.2
     //

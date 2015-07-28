@@ -13,6 +13,7 @@
 
 #include <boost/utility/string_ref.hpp>
 #include <trial/url/token.hpp>
+#include <trial/url/reader/base.hpp>
 
 namespace trial
 {
@@ -22,38 +23,39 @@ namespace reader
 {
 
 template <typename CharT>
-class basic_authority
+class basic_authority : public reader::base<CharT, basic_authority>
 {
+    friend class reader::base<CharT, basic_authority>;
+    typedef reader::base<CharT, basic_authority> super;
+
 public:
-    typedef CharT value_type;
-    typedef boost::basic_string_ref<value_type> view_type;
+    using typename super::value_type;
+    using typename super::view_type;
 
     basic_authority(const view_type&);
 
-    void reset(const view_type&);
-
-    bool next();
-
-    token::category::value category() const;
-    token::code::value code() const;
-    token::subcode::value subcode() const;
-
-    const view_type& literal() const;
-    template <typename ReturnType> ReturnType value() const;
-
-    const view_type& tail() const;
+    using super::next;
+    using super::reset;
+    using super::category;
+    using super::code;
+    using super::subcode;
+    using super::literal;
+    using super::value;
+    using super::tail;
 
 private:
     void first();
+    void do_reset();
+    bool do_next();
 
     token::subcode::value next_userinfo();
     token::subcode::value next_host();
     token::subcode::value next_port();
 
 private:
-    view_type input;
-    token::subcode::value current_token;
-    view_type current_view;
+    using super::input;
+    using super::current_view;
+    using super::current_token;
 };
 
 typedef basic_authority<char> authority;

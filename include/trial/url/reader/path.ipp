@@ -21,64 +21,48 @@ namespace url
 namespace reader
 {
 
+namespace detail
+{
+
+//-----------------------------------------------------------------------------
+// converter
+//-----------------------------------------------------------------------------
+
+template <typename CharT,
+          typename ReturnType>
+struct converter<CharT,
+                 basic_path,
+                 ReturnType,
+                 typename boost::enable_if< boost::is_same<ReturnType, std::basic_string<CharT> > >::type>
+{
+    typedef typename base<CharT, basic_path>::view_type view_type;
+    static ReturnType convert(const view_type& view)
+    {
+        return syntax::segment<CharT>::decode(view);
+    }
+};
+
+} // namespace detail
+
+//-----------------------------------------------------------------------------
+// basic_path
+//-----------------------------------------------------------------------------
+
 template <typename CharT>
 basic_path<CharT>::basic_path(const view_type& view)
-    : input(view),
-      current_token(token::subcode::end),
-      current_view(view)
+    : super(view)
 {
     first();
 }
 
 template <typename CharT>
-token::category::value basic_path<CharT>::category() const
+void basic_path<CharT>::do_reset()
 {
-    return token::category(code());
-}
-
-template <typename CharT>
-token::code::value basic_path<CharT>::code() const
-{
-    return token::code(subcode());
-}
-
-template <typename CharT>
-token::subcode::value basic_path<CharT>::subcode() const
-{
-    return current_token;
-}
-
-template <typename CharT>
-const typename basic_path<CharT>::view_type&
-basic_path<CharT>::literal() const
-{
-    return current_view;
-}
-
-template <typename CharT>
-template <typename ReturnType>
-ReturnType basic_path<CharT>::value() const
-{
-    return syntax::segment<value_type>::decode(current_view);
-}
-
-template <typename CharT>
-const typename basic_path<CharT>::view_type&
-basic_path<CharT>::tail() const
-{
-    return input;
-}
-
-template <typename CharT>
-void basic_path<CharT>::reset(const view_type& view)
-{
-    input = current_view = view;
-    current_token = token::subcode::end;
     first();
 }
 
 template <typename CharT>
-bool basic_path<CharT>::next()
+bool basic_path<CharT>::do_next()
 {
     current_token = (this->*next_state)();
     return category() != token::category::error;

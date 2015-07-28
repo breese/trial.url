@@ -13,7 +13,7 @@
 
 #include <string>
 #include <boost/config.hpp>
-#include <boost/utility/string_ref.hpp>
+#include <trial/url/reader/base.hpp>
 #include <trial/url/token.hpp>
 
 namespace trial
@@ -24,38 +24,39 @@ namespace reader
 {
 
 template <typename CharT>
-class basic_path
+class basic_path : public reader::base<CharT, basic_path>
 {
+    friend class reader::base<CharT, basic_path>;
+    typedef reader::base<CharT, basic_path> super;
+
 public:
-    typedef CharT value_type;
-    typedef boost::basic_string_ref<value_type> view_type;
+    using typename super::value_type;
+    using typename super::view_type;
 
     basic_path(const view_type&);
 
-    void reset(const view_type&);
-
-    bool next();
-
-    token::category::value category() const;
-    token::code::value code() const;
-    token::subcode::value subcode() const;
-
-    const view_type& literal() const;
-    template <typename ReturnType> ReturnType value() const;
-
-    const view_type& tail() const;
+    using super::next;
+    using super::reset;
+    using super::category;
+    using super::code;
+    using super::subcode;
+    using super::literal;
+    using super::value;
 
 private:
     void first();
+    void do_reset();
+    bool do_next();
     token::subcode::value next_done();
     token::subcode::value next_abempty();
 
 private:
-    view_type input;
+    using super::input;
+    using super::current_view;
+    using super::current_token;
+
     typedef token::subcode::value (basic_path::*next_function)();
     next_function next_state;
-    token::subcode::value current_token;
-    view_type current_view;
 };
 
 typedef basic_path<char> path;

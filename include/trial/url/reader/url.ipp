@@ -25,46 +25,11 @@ namespace reader
 
 template <typename CharT>
 basic_url<CharT>::basic_url(const view_type& view)
-    : input(view),
-      current_token(token::subcode::end),
-      current_view(view),
+    : super(view),
       authority_reader(view),
       path_reader(view)
 {
     first();
-}
-
-template <typename CharT>
-token::category::value basic_url<CharT>::category() const
-{
-    return token::category(code());
-}
-
-template <typename CharT>
-token::code::value basic_url<CharT>::code() const
-{
-    return token::code(subcode());
-}
-
-template <typename CharT>
-token::subcode::value basic_url<CharT>::subcode() const
-{
-    return current_token;
-}
-
-template <typename CharT>
-const typename basic_url<CharT>::view_type&
-basic_url<CharT>::literal() const
-{
-    return current_view;
-}
-
-template <typename CharT>
-template <typename ReturnType>
-ReturnType basic_url<CharT>::value() const
-{
-    return ReturnType(current_view.begin(),
-                      current_view.end());
 }
 
 template <typename CharT>
@@ -74,7 +39,13 @@ void basic_url<CharT>::first()
 }
 
 template <typename CharT>
-bool basic_url<CharT>::next()
+void basic_url<CharT>::do_reset()
+{
+    first();
+}
+
+template <typename CharT>
+bool basic_url<CharT>::do_next()
 {
     // RFC 3986 Section 3
     //

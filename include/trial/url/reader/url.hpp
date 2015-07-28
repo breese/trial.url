@@ -11,8 +11,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/utility/string_ref.hpp>
-#include <trial/url/token.hpp>
+#include <trial/url/reader/base.hpp>
 #include <trial/url/reader/authority.hpp>
 #include <trial/url/reader/path.hpp>
 
@@ -24,25 +23,29 @@ namespace reader
 {
 
 template <typename CharT>
-class basic_url
+class basic_url : public reader::base<CharT, basic_url>
 {
+    friend class reader::base<CharT, basic_url>;
+    typedef reader::base<CharT, basic_url> super;
+
 public:
-    typedef CharT value_type;
-    typedef boost::basic_string_ref<value_type> view_type;
+    using typename super::value_type;
+    using typename super::view_type;
 
     basic_url(const view_type&);
 
-    bool next();
-
-    token::category::value category() const;
-    token::code::value code() const;
-    token::subcode::value subcode() const;
-
-    const view_type& literal() const;
-    template <typename ReturnType> ReturnType value() const;
+    using super::next;
+    using super::reset;
+    using super::category;
+    using super::code;
+    using super::subcode;
+    using super::literal;
+    using super::value;
 
 private:
     void first();
+    void do_reset();
+    bool do_next();
 
     token::subcode::value next_scheme();
     token::subcode::value next_hier_part();
@@ -52,9 +55,10 @@ private:
     token::subcode::value next_fragment();
 
 private:
-    view_type input;
-    token::subcode::value current_token;
-    view_type current_view;
+    using super::input;
+    using super::current_view;
+    using super::current_token;
+
     url::reader::authority authority_reader;
     url::reader::path path_reader;
 };
