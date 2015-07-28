@@ -30,6 +30,8 @@ public:
 
     basic_path_reader(const view_type&);
 
+    void reset(const view_type&);
+
     bool next();
 
     token::category::value category() const;
@@ -38,6 +40,8 @@ public:
 
     const view_type& literal() const;
     template <typename ReturnType> ReturnType value() const;
+
+    const view_type& tail() const;
 
 private:
     void first();

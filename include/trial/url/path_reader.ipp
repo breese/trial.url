@@ -22,6 +22,7 @@ namespace url
 template <typename CharT>
 basic_path_reader<CharT>::basic_path_reader(const view_type& view)
     : input(view),
+      current_token(token::subcode::end),
       current_view(view)
 {
     first();
@@ -57,6 +58,21 @@ template <typename ReturnType>
 ReturnType basic_path_reader<CharT>::value() const
 {
     return syntax::segment<value_type>::decode(current_view);
+}
+
+template <typename CharT>
+const typename basic_path_reader<CharT>::view_type&
+basic_path_reader<CharT>::tail() const
+{
+    return input;
+}
+
+template <typename CharT>
+void basic_path_reader<CharT>::reset(const view_type& view)
+{
+    input = current_view = view;
+    current_token = token::subcode::end;
+    first();
 }
 
 template <typename CharT>

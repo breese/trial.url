@@ -26,10 +26,10 @@ namespace url
 template <typename CharT>
 basic_authority_reader<CharT>::basic_authority_reader(const view_type& view)
     : input(view),
-      current_type(token::subcode::end),
+      current_token(token::subcode::end),
       current_view(view)
 {
-    next();
+    first();
 }
 
 template <typename CharT>
@@ -47,7 +47,7 @@ token::code::value basic_authority_reader<CharT>::code() const
 template <typename CharT>
 token::subcode::value basic_authority_reader<CharT>::subcode() const
 {
-    return current_type;
+    return current_token;
 }
 
 template <typename CharT>
@@ -67,8 +67,24 @@ ReturnType basic_authority_reader<CharT>::value() const
 }
 
 template <typename CharT>
+const typename basic_authority_reader<CharT>::view_type&
+basic_authority_reader<CharT>::tail() const
+{
+    return input;
+}
+
+template <typename CharT>
+void basic_authority_reader<CharT>::reset(const view_type& view)
+{
+    input = current_view = view;
+    current_token = token::subcode::end;
+    first();
+}
+
+template <typename CharT>
 void basic_authority_reader<CharT>::first()
 {
+    next();
 }
 
 template <typename CharT>
@@ -79,30 +95,33 @@ bool basic_authority_reader<CharT>::next()
     // authority = [ userinfo "@" ] host [ ":" port ]
 
     if (input.empty())
-        current_type = token::subcode::end;
+    {
+        current_token = token::subcode::end;
+        return false;
+    }
 
     switch (code())
     {
     case token::code::end:
-        current_type = next_userinfo();
+        current_token = next_userinfo();
         if (code() == token::code::end)
-            current_type = next_host();
+            current_token = next_host();
         break;
 
     case token::code::authority_userinfo:
-        current_type = next_host();
+        current_token = next_host();
         break;
 
     case token::code::authority_host:
-        current_type = next_port();
+        current_token = next_port();
         break;
 
     case token::code::authority_port:
-        current_type = token::subcode::end;
+        current_token = token::subcode::end;
         break;
 
     default:
-        current_type = token::subcode::unknown;
+        current_token = token::subcode::unknown;
         break;
     }
     return (category() != token::category::error);

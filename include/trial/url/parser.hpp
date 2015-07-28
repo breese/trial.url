@@ -42,7 +42,7 @@ public:
     string_type fragment() const;
 
 private:
-    void parse(view_type);
+    void parse(const view_type&);
     std::size_t parse_scheme(const view_type&);
     std::size_t parse_hier_part(const view_type&);
     std::size_t parse_authority(const view_type&);

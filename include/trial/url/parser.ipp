@@ -11,10 +11,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <trial/url/syntax/character.hpp>
-#include <trial/url/syntax/scheme.hpp>
-#include <trial/url/authority_reader.hpp>
-#include <trial/url/path_reader.hpp>
+#include <trial/url/reader.hpp>
 
 namespace trial
 {
@@ -106,189 +103,59 @@ basic_parser<CharT>::fragment() const
 //-----------------------------------------------------------------------------
 
 template <typename CharT>
-void basic_parser<CharT>::parse(view_type input)
+void basic_parser<CharT>::parse(const view_type& input)
 {
-    // RFC 3986 Section 3
-    //
-    // URI = scheme ":" hier-part [ "?" query ] [ "#" fragment ]
-    //
-    // RFC 7230 Section 5.3
-    //
-    // request-target = origin-form
-    //                / absolute-form
-    //                / authority-form
-    //                / asterisk-form
+    url::basic_reader<CharT> reader(input);
 
-    if (input.empty())
-        return;
-
-    std::size_t processed = 0;
-    if (input.front() != syntax::character<value_type>::alpha_slash)
-    {
-        processed = parse_scheme(input);
-        input.remove_prefix(processed);
-
-        if (input.empty() || (input.front() != syntax::character<value_type>::alpha_colon))
-            return; // FIXME: Report error
-        input.remove_prefix(1);
-    }
-
-    processed = parse_hier_part(input);
-    if (processed == 0)
-        return;
-    input.remove_prefix(processed);
-    if (input.empty())
-        return;
-
-    if (input.front() == syntax::character<value_type>::alpha_question_mark)
-    {
-        input.remove_prefix(1);
-        processed = parse_query(input);
-        if (processed == 0)
-            return;
-        if (input.empty())
-            return;
-    }
-    if (input.front() == syntax::character<value_type>::alpha_number_sign)
-    {
-        input.remove_prefix(1);
-        processed = parse_fragment(input);
-        if (processed == 0)
-            return;
-        if (input.empty())
-            return;
-    }
-}
-
-template <typename CharT>
-std::size_t basic_parser<CharT>::parse_scheme(const view_type& input)
-{
-    std::size_t processed = syntax::scheme<value_type>::match(input);
-    if (processed > 0)
-        current_scheme = input.substr(0, processed);
-    return processed;
-}
-
-template <typename CharT>
-std::size_t basic_parser<CharT>::parse_hier_part(const view_type& input)
-{
-    // RFC 3986 Section 3
-    //
-    // hier-part = "//" authority path-abempty
-    //           / path-absolute
-    //           / path-rootless
-    //           / path-empty
-
-    std::size_t current = 0;
-    std::size_t processed = 0;
-
-    if (input[current] == syntax::character<value_type>::alpha_slash)
-    {
-        ++current;
-        if (input[current] == syntax::character<value_type>::alpha_slash)
-        {
-            ++current;
-            processed = parse_authority(input.substr(current));
-            if (processed == 0)
-                return 0;
-            current_authority = input.substr(current, processed);
-            current += processed;
-        }
-    }
-    processed = parse_path(input.substr(current));
-    if (processed == 0)
-        return current;
-    current_path = input.substr(current, processed);
-    current += processed;
-    return current;
-}
-
-template <typename CharT>
-std::size_t basic_parser<CharT>::parse_authority(const view_type& input)
-{
-    basic_authority_reader<value_type> reader(input);
-
-    typename view_type::const_iterator end = input.begin();
+    typename view_type::const_iterator authority_begin = input.end();
+    typename view_type::const_iterator authority_end = input.end();
+    typename view_type::const_iterator path_begin = input.end();
+    typename view_type::const_iterator path_end = input.end();
     do
     {
-        end = reader.literal().end();
+        switch (reader.code())
+        {
+        case token::code::end:
+        case token::code::error:
+            break;
+
+        case token::code::scheme:
+            current_scheme = reader.literal();
+            break;
+
+        case token::code::authority_userinfo:
+            authority_begin = reader.literal().begin();
+            authority_end = reader.literal().end();
+            break;
+
+        case token::code::authority_host:
+            if (authority_begin == input.end())
+                authority_begin = reader.literal().begin();
+            authority_end = reader.literal().end();
+            break;
+
+        case token::code::authority_port:
+            authority_end = reader.literal().end();
+            break;
+
+        case token::code::path_segment:
+            if (path_begin == input.end())
+                path_begin = reader.literal().begin() - 1; // Include initial /
+            path_end = reader.literal().end();
+            break;
+
+        case token::code::query:
+            current_query = reader.literal();
+            break;
+
+        case token::code::fragment:
+            current_fragment = reader.literal();
+            break;
+        }
     } while (reader.next());
 
-    return std::distance(input.begin(), end);
-}
-
-template <typename CharT>
-std::size_t basic_parser<CharT>::parse_path(const view_type& input)
-{
-    basic_path_reader<value_type> reader(input);
-
-    typename view_type::const_iterator end = input.begin();
-    do
-    {
-        end = reader.literal().end();
-    } while (reader.next());
-
-    return std::distance(input.begin(), end);
-}
-
-template <typename CharT>
-std::size_t basic_parser<CharT>::parse_query(const view_type& input)
-{
-    // RFC 3986 Section 3.4
-    //
-    // query = *( pchar / "/" / "?" )
-
-    typename view_type::const_iterator current = input.begin();
-    while (current != input.end())
-    {
-        std::size_t processed = syntax::pchar<value_type>::match(&*current);
-        if (processed == 0)
-        {
-            if ((*current == syntax::character<value_type>::alpha_slash) ||
-                (*current == syntax::character<value_type>::alpha_question_mark))
-            {
-                processed = 1;
-            }
-            else
-            {
-                break;
-            }
-        }
-        current += processed;
-    }
-    const std::size_t result = std::distance(input.begin(), current);
-    current_query = input.substr(0, result);
-    return result;
-}
-
-template <typename CharT>
-std::size_t basic_parser<CharT>::parse_fragment(const view_type& input)
-{
-    // RFC 3986 Section 3.5
-    // 
-    // fragment = *( pchar / "/" / "?" )
-
-    typename view_type::const_iterator current = input.begin();
-    while (current != input.end())
-    {
-        std::size_t processed = syntax::pchar<value_type>::match(&*current);
-        if (processed == 0)
-        {
-            if ((*current == syntax::character<value_type>::alpha_slash) ||
-                (*current == syntax::character<value_type>::alpha_question_mark))
-            {
-                processed = 1;
-            }
-            else
-            {
-                break;
-            }
-        }
-        current += processed;
-    }
-    const std::size_t result = std::distance(input.begin(), current);
-    current_fragment = input.substr(0, result);
-    return result;
+    current_authority = view_type(authority_begin, std::distance(authority_begin, authority_end));
+    current_path = view_type(path_begin, std::distance(path_begin, path_end));
 }
 
 } // namespace url

@@ -38,11 +38,17 @@ struct code
         end,
         error,
 
+        scheme,
+
         authority_userinfo,
         authority_host,
         authority_port,
 
-        path_segment
+        path_segment,
+
+        query,
+
+        fragment
     };
 };
 
@@ -53,13 +59,19 @@ struct subcode
         end,
         unknown,
 
+        scheme,
+
         authority_userinfo,
         authority_host_name,
         authority_host_ipv4,
         authority_host_ipv6,
         authority_port,
 
-        path_segment
+        path_segment,
+
+        query,
+
+        fragment
     };
 };
 
@@ -69,6 +81,9 @@ inline category::value category(code::value value)
     {
     case code::end:
         return category::error;
+
+    case code::scheme:
+        return category::scheme;
 
     case code::error:
         return category::error;
@@ -80,6 +95,12 @@ inline category::value category(code::value value)
 
     case code::path_segment:
         return category::path;
+
+    case code::query:
+        return category::query;
+
+    case code::fragment:
+        return category::fragment;
     }
 
     return category::error;
@@ -95,6 +116,9 @@ inline code::value code(subcode::value value)
     case subcode::unknown:
         return code::error;
 
+    case subcode::scheme:
+        return code::scheme;
+
     case subcode::authority_userinfo:
         return code::authority_userinfo;
 
@@ -108,6 +132,12 @@ inline code::value code(subcode::value value)
 
     case subcode::path_segment:
         return code::path_segment;
+
+    case subcode::query:
+        return code::query;
+
+    case subcode::fragment:
+        return code::fragment;
     }
 
     return code::error;
