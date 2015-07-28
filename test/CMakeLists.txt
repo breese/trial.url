@@ -5,10 +5,10 @@
 add_executable(test_url
   runner.cpp
   parser_suite.cpp
-  reader_suite.cpp
-  authority_reader_suite.cpp
-  path_reader_suite.cpp
-  query_form_reader_suite.cpp
+  reader/url_suite.cpp
+  reader/authority_suite.cpp
+  reader/path_suite.cpp
+  reader/query_form_suite.cpp
 )
 
 target_link_libraries(test_url

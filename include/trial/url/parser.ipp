@@ -11,7 +11,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <trial/url/reader.hpp>
+#include <trial/url/reader/url.hpp>
 
 namespace trial
 {
@@ -147,7 +147,7 @@ basic_parser<CharT>::fragment() const
 template <typename CharT>
 void basic_parser<CharT>::parse(const view_type& input)
 {
-    url::basic_reader<CharT> reader(input);
+    url::reader::basic_url<CharT> reader(input);
 
     typename view_type::const_iterator authority_begin = input.end();
     typename view_type::const_iterator authority_end = input.end();

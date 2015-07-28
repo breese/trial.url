@@ -1,5 +1,5 @@
-#ifndef TRIAL_URL_PATH_READER_HPP
-#define TRIAL_URL_PATH_READER_HPP
+#ifndef TRIAL_URL_READER_QUERY_FORM_HPP
+#define TRIAL_URL_READER_QUERY_FORM_HPP
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -12,25 +12,27 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <string>
-#include <boost/config.hpp>
 #include <boost/utility/string_ref.hpp>
 #include <trial/url/token.hpp>
+
+// http://www.w3.org/TR/html401/interact/forms.html
 
 namespace trial
 {
 namespace url
 {
+namespace reader
+{
 
 template <typename CharT>
-class basic_path_reader
+class basic_query_form
 {
 public:
     typedef CharT value_type;
     typedef boost::basic_string_ref<value_type> view_type;
+    typedef std::basic_string<value_type> string_type;
 
-    basic_path_reader(const view_type&);
-
-    void reset(const view_type&);
+    basic_query_form(const view_type&);
 
     bool next();
 
@@ -38,29 +40,30 @@ public:
     token::code::value code() const;
     token::subcode::value subcode() const;
 
-    const view_type& literal() const;
+    const view_type& literal_key() const;
+    const view_type& literal_value() const;
+
+    string_type key() const;
     template <typename ReturnType> ReturnType value() const;
 
-    const view_type& tail() const;
-
 private:
-    void first();
-    token::subcode::value next_done();
-    token::subcode::value next_abempty();
+    bool first();
+    std::size_t parse_key(const view_type&);
+    std::size_t parse_value(const view_type&);
 
 private:
     view_type input;
-    typedef token::subcode::value (basic_path_reader::*next_function)();
-    next_function next_state;
     token::subcode::value current_token;
-    view_type current_view;
+    view_type current_key;
+    view_type current_value;
 };
 
-typedef basic_path_reader<char> path_reader;
+typedef basic_query_form<char> query_form;
 
+} // namespace reader
 } // namespace url
 } // namespace trial
 
-#include <trial/url/path_reader.ipp>
+#include <trial/url/reader/query_form.ipp>
 
-#endif // TRIAL_URL_PATH_READER_HPP
+#endif // TRIAL_URL_READER_QUERY_FORM_HPP

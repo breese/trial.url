@@ -11,16 +11,16 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <trial/url/reader.hpp>
+#include <trial/url/reader/url.hpp>
 
 namespace url = trial::url;
 
-BOOST_AUTO_TEST_SUITE(reader_suite)
+BOOST_AUTO_TEST_SUITE(reader_url_suite)
 
 BOOST_AUTO_TEST_CASE(test_empty)
 {
     const char input[] = "";
-    url::reader reader(input);
+    url::reader::url reader(input);
     BOOST_REQUIRE_EQUAL(reader.category(), url::token::category::error);
     BOOST_REQUIRE_EQUAL(reader.code(), url::token::code::end);
     BOOST_REQUIRE_EQUAL(reader.literal(), "");
@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(test_empty)
 BOOST_AUTO_TEST_CASE(test_scheme)
 {
     const char input[] = "scheme:";
-    url::reader reader(input);
+    url::reader::url reader(input);
     BOOST_REQUIRE_EQUAL(reader.category(), url::token::category::scheme);
     BOOST_REQUIRE_EQUAL(reader.code(), url::token::code::scheme);
     BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::scheme);
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(test_scheme)
 BOOST_AUTO_TEST_CASE(test_host_empty)
 {
     const char input[] = "scheme://";
-    url::reader reader(input);
+    url::reader::url reader(input);
     BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::scheme);
     BOOST_REQUIRE_EQUAL(reader.literal(), "scheme");
     BOOST_REQUIRE_EQUAL(reader.next(), false);
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(test_host_empty)
 BOOST_AUTO_TEST_CASE(test_host)
 {
     const char input[] = "scheme://1.2.3.4";
-    url::reader reader(input);
+    url::reader::url reader(input);
     BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::scheme);
     BOOST_REQUIRE_EQUAL(reader.literal(), "scheme");
     BOOST_REQUIRE_EQUAL(reader.next(), true);
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(test_host)
 BOOST_AUTO_TEST_CASE(test_host_port)
 {
     const char input[] = "scheme://1.2.3.4:80";
-    url::reader reader(input);
+    url::reader::url reader(input);
     BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::scheme);
     BOOST_REQUIRE_EQUAL(reader.literal(), "scheme");
     BOOST_REQUIRE_EQUAL(reader.next(), true);
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(test_host_port)
 BOOST_AUTO_TEST_CASE(test_host_port_slash)
 {
     const char input[] = "scheme://1.2.3.4:80/";
-    url::reader reader(input);
+    url::reader::url reader(input);
     BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::scheme);
     BOOST_REQUIRE_EQUAL(reader.literal(), "scheme");
     BOOST_REQUIRE_EQUAL(reader.next(), true);
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(test_host_port_slash)
 BOOST_AUTO_TEST_CASE(test_path_plain)
 {
     const char input[] = "scheme://example.com/path";
-    url::reader reader(input);
+    url::reader::url reader(input);
     BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::scheme);
     BOOST_REQUIRE_EQUAL(reader.literal(), "scheme");
     BOOST_REQUIRE_EQUAL(reader.next(), true);
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE(test_path_plain)
 BOOST_AUTO_TEST_CASE(test_query_plain)
 {
     const char input[] = "scheme://example.com/path?query";
-    url::reader reader(input);
+    url::reader::url reader(input);
     BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::scheme);
     BOOST_REQUIRE_EQUAL(reader.literal(), "scheme");
     BOOST_REQUIRE_EQUAL(reader.next(), true);
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE(test_query_plain)
 BOOST_AUTO_TEST_CASE(test_fragment_plain)
 {
     const char input[] = "scheme://example.com/path#fragment";
-    url::reader reader(input);
+    url::reader::url reader(input);
     BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::scheme);
     BOOST_REQUIRE_EQUAL(reader.literal(), "scheme");
     BOOST_REQUIRE_EQUAL(reader.next(), true);
@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_CASE(test_fragment_plain)
 BOOST_AUTO_TEST_CASE(test_query_fragment_plain)
 {
     const char input[] = "scheme://example.com/path?query#fragment";
-    url::reader reader(input);
+    url::reader::url reader(input);
     BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::scheme);
     BOOST_REQUIRE_EQUAL(reader.literal(), "scheme");
     BOOST_REQUIRE_EQUAL(reader.next(), true);
@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_CASE(test_query_fragment_plain)
 BOOST_AUTO_TEST_CASE(test_fragment_question)
 {
     const char input[] = "scheme://example.com/path#fragment?query";
-    url::reader reader(input);
+    url::reader::url reader(input);
     BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::scheme);
     BOOST_REQUIRE_EQUAL(reader.literal(), "scheme");
     BOOST_REQUIRE_EQUAL(reader.next(), true);

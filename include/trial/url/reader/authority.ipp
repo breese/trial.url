@@ -1,5 +1,5 @@
-#ifndef TRIAL_URL_AUTHORITY_READER_IPP
-#define TRIAL_URL_AUTHORITY_READER_IPP
+#ifndef TRIAL_URL_READER_AUTHORITY_IPP
+#define TRIAL_URL_READER_AUTHORITY_IPP
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -22,9 +22,11 @@ namespace trial
 {
 namespace url
 {
+namespace reader
+{
 
 template <typename CharT>
-basic_authority_reader<CharT>::basic_authority_reader(const view_type& view)
+basic_authority<CharT>::basic_authority(const view_type& view)
     : input(view),
       current_token(token::subcode::end),
       current_view(view)
@@ -33,33 +35,33 @@ basic_authority_reader<CharT>::basic_authority_reader(const view_type& view)
 }
 
 template <typename CharT>
-token::category::value basic_authority_reader<CharT>::category() const
+token::category::value basic_authority<CharT>::category() const
 {
     return token::category(code());
 }
 
 template <typename CharT>
-token::code::value basic_authority_reader<CharT>::code() const
+token::code::value basic_authority<CharT>::code() const
 {
     return token::code(subcode());
 }
 
 template <typename CharT>
-token::subcode::value basic_authority_reader<CharT>::subcode() const
+token::subcode::value basic_authority<CharT>::subcode() const
 {
     return current_token;
 }
 
 template <typename CharT>
-const typename basic_authority_reader<CharT>::view_type&
-basic_authority_reader<CharT>::literal() const
+const typename basic_authority<CharT>::view_type&
+basic_authority<CharT>::literal() const
 {
     return current_view;
 }
 
 template <typename CharT>
 template <typename ReturnType>
-ReturnType basic_authority_reader<CharT>::value() const
+ReturnType basic_authority<CharT>::value() const
 {
     // FIXME: Via converter
     return ReturnType(current_view.begin(),
@@ -67,14 +69,14 @@ ReturnType basic_authority_reader<CharT>::value() const
 }
 
 template <typename CharT>
-const typename basic_authority_reader<CharT>::view_type&
-basic_authority_reader<CharT>::tail() const
+const typename basic_authority<CharT>::view_type&
+basic_authority<CharT>::tail() const
 {
     return input;
 }
 
 template <typename CharT>
-void basic_authority_reader<CharT>::reset(const view_type& view)
+void basic_authority<CharT>::reset(const view_type& view)
 {
     input = current_view = view;
     current_token = token::subcode::end;
@@ -82,13 +84,13 @@ void basic_authority_reader<CharT>::reset(const view_type& view)
 }
 
 template <typename CharT>
-void basic_authority_reader<CharT>::first()
+void basic_authority<CharT>::first()
 {
     next();
 }
 
 template <typename CharT>
-bool basic_authority_reader<CharT>::next()
+bool basic_authority<CharT>::next()
 {
     // RFC 3986 Section 3.2
     //
@@ -128,7 +130,7 @@ bool basic_authority_reader<CharT>::next()
 }
 
 template <typename CharT>
-token::subcode::value basic_authority_reader<CharT>::next_userinfo()
+token::subcode::value basic_authority<CharT>::next_userinfo()
 {
     std::size_t processed = syntax::userinfo<value_type>::match(input);
     if (input[processed] == syntax::character<value_type>::alpha_at)
@@ -141,7 +143,7 @@ token::subcode::value basic_authority_reader<CharT>::next_userinfo()
 }
 
 template <typename CharT>
-token::subcode::value basic_authority_reader<CharT>::next_host()
+token::subcode::value basic_authority<CharT>::next_host()
 {
     // RFC 3986 Section 3.2.2
     //
@@ -182,7 +184,7 @@ token::subcode::value basic_authority_reader<CharT>::next_host()
 }
 
 template <typename CharT>
-token::subcode::value basic_authority_reader<CharT>::next_port()
+token::subcode::value basic_authority<CharT>::next_port()
 {
     if (input.front() == syntax::character<value_type>::alpha_colon)
     {
@@ -198,7 +200,8 @@ token::subcode::value basic_authority_reader<CharT>::next_port()
     return token::subcode::end;
 }
 
+} // namespace reader
 } // namespace url
 } // namespace trial
 
-#endif // TRIAL_URL_AUTHORITY_READER_IPP
+#endif // TRIAL_URL_READER_AUTHORITY_IPP

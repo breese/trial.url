@@ -1,5 +1,5 @@
-#ifndef TRIAL_URL_QUERY_FORM_READER_HPP
-#define TRIAL_URL_QUERY_FORM_READER_HPP
+#ifndef TRIAL_URL_READER_URL_HPP
+#define TRIAL_URL_READER_URL_HPP
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -11,26 +11,26 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <string>
 #include <boost/utility/string_ref.hpp>
 #include <trial/url/token.hpp>
-
-// http://www.w3.org/TR/html401/interact/forms.html
+#include <trial/url/reader/authority.hpp>
+#include <trial/url/reader/path.hpp>
 
 namespace trial
 {
 namespace url
 {
+namespace reader
+{
 
 template <typename CharT>
-class basic_query_form_reader
+class basic_url
 {
 public:
     typedef CharT value_type;
     typedef boost::basic_string_ref<value_type> view_type;
-    typedef std::basic_string<value_type> string_type;
 
-    basic_query_form_reader(const view_type&);
+    basic_url(const view_type&);
 
     bool next();
 
@@ -38,29 +38,33 @@ public:
     token::code::value code() const;
     token::subcode::value subcode() const;
 
-    const view_type& literal_key() const;
-    const view_type& literal_value() const;
-
-    string_type key() const;
+    const view_type& literal() const;
     template <typename ReturnType> ReturnType value() const;
 
 private:
-    bool first();
-    std::size_t parse_key(const view_type&);
-    std::size_t parse_value(const view_type&);
+    void first();
+
+    token::subcode::value next_scheme();
+    token::subcode::value next_hier_part();
+    token::subcode::value next_authority();
+    token::subcode::value next_path();
+    token::subcode::value next_query();
+    token::subcode::value next_fragment();
 
 private:
     view_type input;
     token::subcode::value current_token;
-    view_type current_key;
-    view_type current_value;
+    view_type current_view;
+    url::reader::authority authority_reader;
+    url::reader::path path_reader;
 };
 
-typedef basic_query_form_reader<char> query_form_reader;
+typedef basic_url<char> url;
 
+} // namespace reader
 } // namespace url
 } // namespace trial
 
-#include <trial/url/query_form_reader.ipp>
+#include <trial/url/reader/url.ipp>
 
-#endif // TRIAL_URL_QUERY_FORM_READER_HPP
+#endif // TRIAL_URL_READER_URL_HPP

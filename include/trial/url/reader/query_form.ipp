@@ -1,5 +1,5 @@
-#ifndef TRIAL_URL_QUERY_FORM_READER_IPP
-#define TRIAL_URL_QUERY_FORM_READER_IPP
+#ifndef TRIAL_URL_READER_QUERY_FORM_IPP
+#define TRIAL_URL_READER_QUERY_FORM_IPP
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -18,6 +18,8 @@ namespace trial
 {
 namespace url
 {
+namespace reader
+{
 
 //-----------------------------------------------------------------------------
 // detail::query_form_converter
@@ -29,8 +31,8 @@ namespace detail
 template <typename CharT, typename ReturnType>
 struct query_form_converter
 {
-    typedef typename basic_query_form_reader<CharT>::value_type value_type;
-    typedef typename basic_query_form_reader<CharT>::view_type view_type;
+    typedef typename basic_query_form<CharT>::value_type value_type;
+    typedef typename basic_query_form<CharT>::view_type view_type;
 
     static ReturnType convert(const view_type& input)
     {
@@ -73,14 +75,14 @@ struct query_form_converter
 //-----------------------------------------------------------------------------
 
 template <typename CharT>
-basic_query_form_reader<CharT>::basic_query_form_reader(const view_type& input)
+basic_query_form<CharT>::basic_query_form(const view_type& input)
     : input(input)
 {
     first();
 }
 
 template <typename CharT>
-bool basic_query_form_reader<CharT>::first()
+bool basic_query_form<CharT>::first()
 {
     // Parse first key-value pair
     //
@@ -123,7 +125,7 @@ bool basic_query_form_reader<CharT>::first()
 }
 
 template <typename CharT>
-bool basic_query_form_reader<CharT>::next()
+bool basic_query_form<CharT>::next()
 {
     if (input.empty())
     {
@@ -142,53 +144,53 @@ bool basic_query_form_reader<CharT>::next()
 }
 
 template <typename CharT>
-const typename basic_query_form_reader<CharT>::view_type&
-basic_query_form_reader<CharT>::literal_key() const
+const typename basic_query_form<CharT>::view_type&
+basic_query_form<CharT>::literal_key() const
 {
     return current_key;
 }
 
 template <typename CharT>
-const typename basic_query_form_reader<CharT>::view_type&
-basic_query_form_reader<CharT>::literal_value() const
+const typename basic_query_form<CharT>::view_type&
+basic_query_form<CharT>::literal_value() const
 {
     return current_value;
 }
 
 template <typename CharT>
-typename basic_query_form_reader<CharT>::string_type
-basic_query_form_reader<CharT>::key() const
+typename basic_query_form<CharT>::string_type
+basic_query_form<CharT>::key() const
 {
     return detail::query_form_converter<value_type, string_type>::convert(current_key);
 }
 
 template <typename CharT>
 template <typename ReturnType>
-ReturnType basic_query_form_reader<CharT>::value() const
+ReturnType basic_query_form<CharT>::value() const
 {
     return detail::query_form_converter<value_type, ReturnType>::convert(current_value);
 }
 
 template <typename CharT>
-token::category::value basic_query_form_reader<CharT>::category() const
+token::category::value basic_query_form<CharT>::category() const
 {
     return token::category(code());
 }
 
 template <typename CharT>
-token::code::value basic_query_form_reader<CharT>::code() const
+token::code::value basic_query_form<CharT>::code() const
 {
     return token::code(subcode());
 }
 
 template <typename CharT>
-token::subcode::value basic_query_form_reader<CharT>::subcode() const
+token::subcode::value basic_query_form<CharT>::subcode() const
 {
     return current_token;
 }
 
 template <typename CharT>
-std::size_t basic_query_form_reader<CharT>::parse_key(const view_type& view)
+std::size_t basic_query_form<CharT>::parse_key(const view_type& view)
 {
     // All characters until =, &, or EOF
 
@@ -208,12 +210,13 @@ std::size_t basic_query_form_reader<CharT>::parse_key(const view_type& view)
 }
 
 template <typename CharT>
-std::size_t basic_query_form_reader<CharT>::parse_value(const view_type& view)
+std::size_t basic_query_form<CharT>::parse_value(const view_type& view)
 {
     return parse_key(view);
 }
 
+} // namespace reader
 } // namespace url
 } // namespace trial
 
-#endif // TRIAL_URL_QUERY_FORM_READER_IPP
+#endif // TRIAL_URL_READER_QUERY_FORM_IPP

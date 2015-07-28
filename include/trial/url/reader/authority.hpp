@@ -1,5 +1,5 @@
-#ifndef TRIAL_URL_READER_HPP
-#define TRIAL_URL_READER_HPP
+#ifndef TRIAL_URL_READER_AUTHORITY_HPP
+#define TRIAL_URL_READER_AUTHORITY_HPP
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -13,22 +13,24 @@
 
 #include <boost/utility/string_ref.hpp>
 #include <trial/url/token.hpp>
-#include <trial/url/authority_reader.hpp>
-#include <trial/url/path_reader.hpp>
 
 namespace trial
 {
 namespace url
 {
+namespace reader
+{
 
 template <typename CharT>
-class basic_reader
+class basic_authority
 {
 public:
     typedef CharT value_type;
     typedef boost::basic_string_ref<value_type> view_type;
 
-    basic_reader(const view_type&);
+    basic_authority(const view_type&);
+
+    void reset(const view_type&);
 
     bool next();
 
@@ -39,29 +41,27 @@ public:
     const view_type& literal() const;
     template <typename ReturnType> ReturnType value() const;
 
+    const view_type& tail() const;
+
 private:
     void first();
 
-    token::subcode::value next_scheme();
-    token::subcode::value next_hier_part();
-    token::subcode::value next_authority();
-    token::subcode::value next_path();
-    token::subcode::value next_query();
-    token::subcode::value next_fragment();
+    token::subcode::value next_userinfo();
+    token::subcode::value next_host();
+    token::subcode::value next_port();
 
 private:
     view_type input;
     token::subcode::value current_token;
     view_type current_view;
-    url::authority_reader authority_reader;
-    url::path_reader path_reader;
 };
 
-typedef basic_reader<char> reader;
+typedef basic_authority<char> authority;
 
+} // namespace reader
 } // namespace url
 } // namespace trial
 
-#include <trial/url/reader.ipp>
+#include <trial/url/reader/authority.ipp>
 
-#endif // TRIAL_URL_READER_HPP
+#endif // TRIAL_URL_READER_AUTHORITY_HPP
