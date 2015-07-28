@@ -126,11 +126,17 @@ template <typename CharT>
 bool basic_query_form_reader<CharT>::next()
 {
     if (input.empty())
+    {
+        current_token = token::subcode::end;
         return false;
+    }
 
     // Skip list separator
     if (input.front() != syntax::character<value_type>::alpha_ampersand)
+    {
+        current_token = token::subcode::unknown;
         return false;
+    }
     input.remove_prefix(1);
     return first();
 }
