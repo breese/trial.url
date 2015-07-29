@@ -12,7 +12,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <string>
-#include <boost/utility/string_ref.hpp>
+#include <trial/url/reader/base.hpp>
 #include <trial/url/token.hpp>
 
 // http://www.w3.org/TR/html401/interact/forms.html
@@ -25,37 +25,40 @@ namespace reader
 {
 
 template <typename CharT>
-class basic_query_form
+class basic_query_form : public reader::base<CharT, basic_query_form>
 {
+    friend class reader::base<CharT, basic_query_form>;
+    typedef reader::base<CharT, basic_query_form> super;
+
 public:
-    typedef CharT value_type;
-    typedef boost::basic_string_ref<value_type> view_type;
-    typedef std::basic_string<value_type> string_type;
+    using typename super::value_type;
+    using typename super::view_type;
 
     basic_query_form(const view_type&);
 
-    bool next();
-
-    token::category::value category() const;
-    token::code::value code() const;
-    token::subcode::value subcode() const;
-
-    const view_type& literal_key() const;
-    const view_type& literal_value() const;
-
-    string_type key() const;
-    template <typename ReturnType> ReturnType value() const;
+    using super::next;
+    using super::reset;
+    using super::category;
+    using super::code;
+    using super::subcode;
+    using super::literal;
+    using super::value;
 
 private:
     bool first();
+    void do_reset();
+    bool do_next();
+    void next_key();
+    void next_value();
     std::size_t parse_key(const view_type&);
     std::size_t parse_value(const view_type&);
 
 private:
-    view_type input;
-    token::subcode::value current_token;
-    view_type current_key;
-    view_type current_value;
+    using super::input;
+    using super::current_view;
+    using super::current_token;
+
+    bool is_key;
 };
 
 typedef basic_query_form<char> query_form;
