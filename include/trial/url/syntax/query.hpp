@@ -26,8 +26,10 @@ class query
 public:
     typedef CharT value_type;
     typedef boost::basic_string_ref<value_type> view_type;
+    typedef std::basic_string<value_type> string_type;
 
     static std::size_t match(const view_type&);
+    static string_type decode(const view_type&);
 
 private:
     static bool is_valid(value_type);

@@ -49,6 +49,34 @@ std::size_t query<CharT>::match(const view_type& view)
     return std::distance(view.begin(), current);
 }
 
+template <typename CharT>
+typename query<CharT>::string_type
+query<CharT>::decode(const view_type& view)
+{
+    string_type result;
+    for (typename view_type::const_iterator current = view.begin();
+         current != view.end();
+         ++current)
+    {
+        std::size_t processed = syntax::pchar<value_type>::match(&*current);
+        if (processed > 0)
+        {
+            result += syntax::pchar<value_type>::decode(&*current);
+            current += (processed - 1);
+        }
+        else if ((*current == syntax::character<value_type>::alpha_slash) ||
+                 (*current == syntax::character<value_type>::alpha_question_mark))
+        {
+            result += *current;
+        }
+        else
+        {
+            break; // for
+        }
+    }
+    return result;
+}
+
 } // namespace syntax
 } // namespace url
 } // namespace trial
