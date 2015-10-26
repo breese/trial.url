@@ -27,8 +27,8 @@ namespace reader
 template <typename CharT>
 class basic_query_form : public reader::base<CharT, basic_query_form>
 {
-    friend class reader::base<CharT, basic_query_form>;
-    typedef reader::base<CharT, basic_query_form> super;
+    friend class reader::base<CharT, reader::basic_query_form>;
+    typedef reader::base<CharT, reader::basic_query_form> super;
 
 public:
     using typename super::value_type;

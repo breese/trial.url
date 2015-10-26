@@ -26,8 +26,8 @@ namespace reader
 template <typename CharT>
 class basic_path : public reader::base<CharT, basic_path>
 {
-    friend class reader::base<CharT, basic_path>;
-    typedef reader::base<CharT, basic_path> super;
+    friend class reader::base<CharT, reader::basic_path>;
+    typedef reader::base<CharT, reader::basic_path> super;
 
 public:
     using typename super::value_type;
