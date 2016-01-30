@@ -160,7 +160,11 @@ void basic_query_form<CharT>::next_value()
     input.remove_prefix(processed);
 
     // Skip list separator
-    if (input.front() == syntax::character<value_type>::alpha_ampersand)
+    if (input.empty())
+    {
+        // Ignore end
+    }
+    else if (input.front() == syntax::character<value_type>::alpha_ampersand)
     {
         input.remove_prefix(1);
     }
