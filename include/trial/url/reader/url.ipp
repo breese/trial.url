@@ -50,6 +50,11 @@ bool basic_url<CharT>::do_next()
     // RFC 3986 Section 3
     //
     // URI = scheme ":" hier-part [ "?" query ] [ "#" fragment ]
+    //
+    // hier-part   = "//" authority path-abempty
+    //             / path-absolute
+    //             / path-rootless
+    //             / path-empty
 
     if (input.empty())
     {
@@ -66,12 +71,19 @@ bool basic_url<CharT>::do_next()
 
     case token::category::scheme:
         current_token = next_hier_part();
+        if (subcode() == token::subcode::end)
+        {
+            // No authority
+            path_reader.reset(input);
+            current_token = next_path();
+        }
         break;
 
     case token::category::authority:
         current_token = next_authority();
         if (subcode() == token::subcode::end)
         {
+            // End of authority
             path_reader.reset(input);
             current_token = next_path();
         }
