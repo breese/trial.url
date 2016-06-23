@@ -109,6 +109,11 @@ template <typename CharT>
 bool basic_query_form<CharT>::do_next()
 {
     // Allow empty value field
+    //
+    // RFC 6570 section 1.3 mentions that:
+    //   "the process for ? (form-style parameters) will not omit the = when
+    //    the value is empty"
+
     if (input.empty() && is_key)
     {
         current_token = token::subcode::end;
