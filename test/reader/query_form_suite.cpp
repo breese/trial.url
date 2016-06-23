@@ -124,19 +124,43 @@ BOOST_AUTO_TEST_CASE(test_percent)
     BOOST_REQUIRE_EQUAL(reader.next(), false);
 }
 
-BOOST_AUTO_TEST_CASE(fail_ampersand)
-{
-    const char input[] = "&";
-    url::reader::query_form reader(input);
-    BOOST_REQUIRE_EQUAL(reader.next(), false);
-}
-
-BOOST_AUTO_TEST_CASE(fail_no_value)
+BOOST_AUTO_TEST_CASE(test_no_value)
 {
     const char input[] = "alpha=";
     url::reader::query_form reader(input);
     BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::query_form_key);
     BOOST_REQUIRE_EQUAL(reader.literal(), "alpha");
+    BOOST_REQUIRE_EQUAL(reader.next(), true);
+    BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::query_form_value);
+    BOOST_REQUIRE_EQUAL(reader.literal(), "");
+    BOOST_REQUIRE_EQUAL(reader.value<std::string>(), "");
+    BOOST_REQUIRE_EQUAL(reader.next(), false);
+}
+
+BOOST_AUTO_TEST_CASE(test_no_value_two)
+{
+    const char input[] = "alpha=&bravo=";
+    url::reader::query_form reader(input);
+    BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::query_form_key);
+    BOOST_REQUIRE_EQUAL(reader.literal(), "alpha");
+    BOOST_REQUIRE_EQUAL(reader.next(), true);
+    BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::query_form_value);
+    BOOST_REQUIRE_EQUAL(reader.literal(), "");
+    BOOST_REQUIRE_EQUAL(reader.value<std::string>(), "");
+    BOOST_REQUIRE_EQUAL(reader.next(), true);
+    BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::query_form_key);
+    BOOST_REQUIRE_EQUAL(reader.literal(), "bravo");
+    BOOST_REQUIRE_EQUAL(reader.next(), true);
+    BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::query_form_value);
+    BOOST_REQUIRE_EQUAL(reader.literal(), "");
+    BOOST_REQUIRE_EQUAL(reader.value<std::string>(), "");
+    BOOST_REQUIRE_EQUAL(reader.next(), false);
+}
+
+BOOST_AUTO_TEST_CASE(fail_ampersand)
+{
+    const char input[] = "&";
+    url::reader::query_form reader(input);
     BOOST_REQUIRE_EQUAL(reader.next(), false);
 }
 

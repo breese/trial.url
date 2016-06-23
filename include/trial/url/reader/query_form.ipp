@@ -108,7 +108,8 @@ bool basic_query_form<CharT>::first()
 template <typename CharT>
 bool basic_query_form<CharT>::do_next()
 {
-    if (input.empty())
+    // Allow empty value field
+    if (input.empty() && is_key)
     {
         current_token = token::subcode::end;
         return false;
@@ -117,12 +118,13 @@ bool basic_query_form<CharT>::do_next()
     if (is_key)
     {
         next_key();
+        is_key = (subcode() == token::subcode::end);
     }
     else
     {
         next_value();
+        is_key = true;
     }
-    is_key = !is_key; // Toggle
     return category() != token::category::error;
 }
 
@@ -151,11 +153,6 @@ template <typename CharT>
 void basic_query_form<CharT>::next_value()
 {
     std::size_t processed = parse_value(input);
-    if (processed == 0)
-    {
-        current_token = token::subcode::unknown;
-        return;
-    }
     current_view = input.substr(0, processed);
     input.remove_prefix(processed);
 
