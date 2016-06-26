@@ -97,7 +97,24 @@ BOOST_AUTO_TEST_CASE(test_host_port_slash)
 // Path
 //-----------------------------------------------------------------------------
 
-BOOST_AUTO_TEST_CASE(test_path_plain)
+BOOST_AUTO_TEST_CASE(test_path_abempty_empty)
+{
+    const char input[] = "scheme://example.com/";
+    url::reader::url reader(input);
+    BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::scheme);
+    BOOST_REQUIRE_EQUAL(reader.literal(), "scheme");
+    BOOST_REQUIRE_EQUAL(reader.next(), true);
+    BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::authority_host_name);
+    BOOST_REQUIRE_EQUAL(reader.literal(), "example.com");
+    BOOST_REQUIRE_EQUAL(reader.next(), true);
+    BOOST_REQUIRE_EQUAL(reader.category(), url::token::category::path);
+    BOOST_REQUIRE_EQUAL(reader.code(), url::token::code::path_segment);
+    BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::path_segment);
+    BOOST_REQUIRE_EQUAL(reader.literal(), "");
+    BOOST_REQUIRE_EQUAL(reader.next(), false);
+}
+
+BOOST_AUTO_TEST_CASE(test_path_abempty_one)
 {
     const char input[] = "scheme://example.com/path";
     url::reader::url reader(input);
@@ -111,6 +128,61 @@ BOOST_AUTO_TEST_CASE(test_path_plain)
     BOOST_REQUIRE_EQUAL(reader.code(), url::token::code::path_segment);
     BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::path_segment);
     BOOST_REQUIRE_EQUAL(reader.literal(), "path");
+    BOOST_REQUIRE_EQUAL(reader.next(), false);
+}
+
+BOOST_AUTO_TEST_CASE(test_path_abempty_two)
+{
+    const char input[] = "scheme://example.com/path/two";
+    url::reader::url reader(input);
+    BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::scheme);
+    BOOST_REQUIRE_EQUAL(reader.literal(), "scheme");
+    BOOST_REQUIRE_EQUAL(reader.next(), true);
+    BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::authority_host_name);
+    BOOST_REQUIRE_EQUAL(reader.literal(), "example.com");
+    BOOST_REQUIRE_EQUAL(reader.next(), true);
+    BOOST_REQUIRE_EQUAL(reader.category(), url::token::category::path);
+    BOOST_REQUIRE_EQUAL(reader.code(), url::token::code::path_segment);
+    BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::path_segment);
+    BOOST_REQUIRE_EQUAL(reader.literal(), "path");
+    BOOST_REQUIRE_EQUAL(reader.next(), true);
+    BOOST_REQUIRE_EQUAL(reader.category(), url::token::category::path);
+    BOOST_REQUIRE_EQUAL(reader.code(), url::token::code::path_segment);
+    BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::path_segment);
+    BOOST_REQUIRE_EQUAL(reader.literal(), "two");
+    BOOST_REQUIRE_EQUAL(reader.next(), false);
+}
+
+BOOST_AUTO_TEST_CASE(test_path_absolute_one)
+{
+    const char input[] = "scheme:/path";
+    url::reader::url reader(input);
+    BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::scheme);
+    BOOST_REQUIRE_EQUAL(reader.literal(), "scheme");
+    BOOST_REQUIRE_EQUAL(reader.next(), true);
+    BOOST_REQUIRE_EQUAL(reader.category(), url::token::category::path);
+    BOOST_REQUIRE_EQUAL(reader.code(), url::token::code::path_segment);
+    BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::path_segment);
+    BOOST_REQUIRE_EQUAL(reader.literal(), "path");
+    BOOST_REQUIRE_EQUAL(reader.next(), false);
+}
+
+BOOST_AUTO_TEST_CASE(test_path_absolute_two)
+{
+    const char input[] = "scheme:/path/two";
+    url::reader::url reader(input);
+    BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::scheme);
+    BOOST_REQUIRE_EQUAL(reader.literal(), "scheme");
+    BOOST_REQUIRE_EQUAL(reader.next(), true);
+    BOOST_REQUIRE_EQUAL(reader.category(), url::token::category::path);
+    BOOST_REQUIRE_EQUAL(reader.code(), url::token::code::path_segment);
+    BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::path_segment);
+    BOOST_REQUIRE_EQUAL(reader.literal(), "path");
+    BOOST_REQUIRE_EQUAL(reader.next(), true);
+    BOOST_REQUIRE_EQUAL(reader.category(), url::token::category::path);
+    BOOST_REQUIRE_EQUAL(reader.code(), url::token::code::path_segment);
+    BOOST_REQUIRE_EQUAL(reader.subcode(), url::token::subcode::path_segment);
+    BOOST_REQUIRE_EQUAL(reader.literal(), "two");
     BOOST_REQUIRE_EQUAL(reader.next(), false);
 }
 

@@ -136,7 +136,11 @@ token::subcode::value basic_url<CharT>::next_hier_part()
         authority_reader.reset(input);
         return next_authority();
     }
-    return token::subcode::end;
+    else
+    {
+        path_reader.reset(input);
+        return next_path();
+    }
 }
 
 template <typename CharT>
