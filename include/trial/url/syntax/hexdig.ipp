@@ -51,9 +51,9 @@ std::size_t hexdig<CharT>::match(value_type value)
     case character<value_type>::alpha_e:
     case character<value_type>::alpha_F:
     case character<value_type>::alpha_f:
-        return true;
+        return 1;
     default:
-        return false;
+        return 0;
     }
 }
 
