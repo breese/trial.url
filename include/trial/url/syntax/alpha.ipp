@@ -27,11 +27,11 @@ std::size_t alpha<CharT>::match(value_type value)
 
     if ((value >= character<value_type>::alpha_A) &&
         (value <= character<value_type>::alpha_Z))
-        return true;
+        return 1;
     if ((value >= character<value_type>::alpha_a) &&
         (value <= character<value_type>::alpha_z))
-        return true;
-    return false;
+        return 1;
+    return 0;
 }
 
 } // namespace syntax
