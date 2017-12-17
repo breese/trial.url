@@ -28,6 +28,7 @@ public:
     typedef boost::basic_string_ref<value_type> view_type;
 
     static std::size_t match(const view_type&);
+    template <typename T> static T decode(const view_type&);
 };
 
 } // namespace syntax

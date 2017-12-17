@@ -11,11 +11,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <cassert>
 #include <trial/url/syntax/character.hpp>
 #include <trial/url/syntax/digit.hpp>
-#include <trial/url/syntax/subdelims.hpp>
-#include <trial/url/syntax/unreserved.hpp>
-#include <trial/url/syntax/pct_encoded.hpp>
 
 namespace trial
 {
@@ -39,6 +37,57 @@ std::size_t port<CharT>::match(const view_type& view)
         ++current;
     }
     return std::distance(view.begin(), current);
+}
+
+template <typename CharT>
+template <typename T>
+auto port<CharT>::decode(const view_type& view) -> T
+{
+    T result = T(0);
+    typename view_type::const_iterator current = view.begin();
+    while (current != view.end())
+    {
+        if (!syntax::digit<value_type>::match(*current))
+            break;
+        result *= T(10);
+        switch (*current)
+        {
+        case character<value_type>::alpha_0:
+            break;
+        case character<value_type>::alpha_1:
+            result += T(1);
+            break;
+        case character<value_type>::alpha_2:
+            result += T(2);
+            break;
+        case character<value_type>::alpha_3:
+            result += T(3);
+            break;
+        case character<value_type>::alpha_4:
+            result += T(4);
+            break;
+        case character<value_type>::alpha_5:
+            result += T(5);
+            break;
+        case character<value_type>::alpha_6:
+            result += T(6);
+            break;
+        case character<value_type>::alpha_7:
+            result += T(7);
+            break;
+        case character<value_type>::alpha_8:
+            result += T(8);
+            break;
+        case character<value_type>::alpha_9:
+            result += T(9);
+            break;
+        default:
+            assert(false);
+            break;
+        }
+        ++current;
+    }
+    return result;
 }
 
 } // namespace syntax
