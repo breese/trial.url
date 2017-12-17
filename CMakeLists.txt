@@ -8,7 +8,7 @@
 #
 ###############################################################################
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.1)
 project(trial.uri)
 
 set(TRIAL_URL_BUILD_DIR ${CMAKE_BINARY_DIR})
@@ -16,9 +16,11 @@ set(TRIAL_URL_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 set(LIBRARY_OUTPUT_PATH ${TRIAL_URL_BUILD_DIR}/lib)
 set(EXECUTABLE_OUTPUT_PATH ${TRIAL_URL_BUILD_DIR}/bin)
 
-add_definitions(-g)
-add_definitions(-Wall)
-#add_definitions(-std=c++11)
+if (MSVC)
+  set(TRIAL_URL_WARNING_FLAGS /W3)
+else()
+  set(TRIAL_URL_WARNING_FLAGS -Wall -Wextra -pedantic -Werror=return-type)
+endif()
 
 ###############################################################################
 # Boost package
@@ -37,6 +39,8 @@ set(TRIAL_URL_DEPENDENT_LIBRARIES
 # Trial.Url package
 ###############################################################################
 
-include_directories(BEFORE include)
+add_definitions(${TRIAL_URL_WARNING_FLAGS})
+
+include_directories(include)
 
 add_subdirectory(test)
