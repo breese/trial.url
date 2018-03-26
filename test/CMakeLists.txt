@@ -14,5 +14,5 @@ add_executable(test_url
 )
 
 target_link_libraries(test_url
-  ${TRIAL_URL_DEPENDENT_LIBRARIES}
+  trial-url
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
