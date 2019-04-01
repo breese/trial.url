@@ -2,6 +2,9 @@
 # Trial.Url Test
 ###############################################################################
 
+find_package(Boost 1.55.0 QUIET REQUIRED COMPONENTS
+  unit_test_framework)
+
 add_executable(test_url
   runner.cpp
   parser_suite.cpp
@@ -15,4 +18,4 @@ add_executable(test_url
 
 target_link_libraries(test_url
   trial-url
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+  Boost::unit_test_framework)
