@@ -28,8 +28,7 @@ endif()
 # Boost package
 ###############################################################################
 
-find_package(Boost 1.55.0 QUIET REQUIRED COMPONENTS
-  system)
+find_package(Boost 1.55.0 QUIET REQUIRED)
 
 ###############################################################################
 # Trial.Url package
@@ -38,7 +37,6 @@ find_package(Boost 1.55.0 QUIET REQUIRED COMPONENTS
 add_definitions(${TRIAL_URL_WARNING_FLAGS})
 
 add_library(trial-url INTERFACE)
-add_dependencies(trial-url ${Boost_SYSTEM_LIBRARY})
 target_include_directories(trial-url INTERFACE
   "${TRIAL_URL_ROOT}/include"
   "${Boost_INCLUDE_DIR}")
